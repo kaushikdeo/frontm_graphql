@@ -68,7 +68,7 @@ module.exports = {
                 const isFoodQuantity = await Food.findOne({
                     _id: foodItem.foodItem,
                     inventory: {$gte: foodItem.itemCount}
-                }, {session});
+                });
                 if (!isFoodQuantity) throw new Error('one of the food item out of stock');
                 await Food.findOneAndUpdate({
                     _id: foodItem.foodItem,
@@ -77,7 +77,7 @@ module.exports = {
                     $inc: {
                         inventory: -foodItem.itemCount,
                     }
-                }), {session}
+                })
             })))
             if (isValid) {
                 const order = new Order({
@@ -87,11 +87,15 @@ module.exports = {
                 await session.commitTransaction();
                 const totalTime = process.hrtime(req.queryStartTime);
                 const totalExecutionTime = `${totalTime[0]} s ${totalTime[1]/1000000} ms`;
+                console.log('totalExecutionTime', totalExecutionTime);
                 return {error: false, message: 'Order saved successfully', savedOrder: savedOrder.orderItems, totalExecutionTime};
             }
         } catch (error) {
             await session.abortTransaction();
-            return {error: true, message: 'Error occured while saving new food item'};
+            const totalTime = process.hrtime(req.queryStartTime);
+            const totalExecutionTime = `${totalTime[0]} s ${totalTime[1]/1000000} ms`;
+            console.log('error', error);
+            return {error: true, message: 'Error occured while saving new food item', totalExecutionTime};
         } finally {
             session.endSession();
         }
