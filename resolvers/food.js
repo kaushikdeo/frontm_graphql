@@ -87,7 +87,6 @@ module.exports = {
                 await session.commitTransaction();
                 const totalTime = process.hrtime(req.queryStartTime);
                 const totalExecutionTime = `${totalTime[0]} s ${totalTime[1]/1000000} ms`;
-                console.log('totalExecutionTime', totalExecutionTime);
                 return {error: false, message: 'Order saved successfully', savedOrder: savedOrder.orderItems, totalExecutionTime};
             }
         } catch (error) {
